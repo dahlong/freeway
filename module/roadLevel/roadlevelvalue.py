@@ -43,6 +43,7 @@ def getRoadLevelValuePer5Mints(fromDate, toDate):
     for fileurl in getRoadLevelValueUrlByDatesList(dateList):
         #print fileurl
         try:
+            print fileurl
             infoValues_xml_root = roadlevel.getXmlroot(fileurl)
         except:
             pass
@@ -53,7 +54,7 @@ def getRoadLevelValuePer5Mints(fromDate, toDate):
         for value in infoValues:
             file_name = value.attrib["routeid"]+'.csv'
             full_file_name = file_dir+file_name
-            print full_file_name
+            #print full_file_name
             with open(full_file_name,'ab') as fileWriter:
                 fileWriter.write(value.attrib["routeid"]+','+value.attrib["datacollecttime"]+','+value.attrib["value"]+','+value.attrib["traveltime"]+'\n')
                 #print value.attrib["datacollecttime"],value.attrib["value"],value.attrib["traveltime"]
