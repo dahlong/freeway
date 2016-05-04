@@ -60,6 +60,7 @@ def getRoadLevelValuePer5Mints(fromDate, toDate):
                 #print value.attrib["datacollecttime"],value.attrib["value"],value.attrib["traveltime"]
 
 
-datefrom = datetime.date(2013,05,01)
-dateto = datetime.date(2016,04,30)
-getRoadLevelValuePer5Mints(datefrom, dateto)
+if __name__ == "__main__":
+    datefrom = datetime.date(2013,05,01)
+    dateto = datetime.date(2016,04,30)
+    getRoadLevelValuePer5Mints(datefrom, dateto)
