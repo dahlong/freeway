@@ -23,8 +23,10 @@ def getVdValueUrlByDateList(dateList):
     return levelValueUrl
 
 def getVdValuePer5Mints(fromDate, toDate):
+    file_name = "vdValue.csv"
     dateList = roadlevelvalue.getHistoryDateTime(fromDate, toDate)
     file_dir = "/home/dahlong/ETC_freewaay/vd/vd_value/"
+    full_file_name =  file_dir + file_name
     for fileurl in getVdValueUrlByDateList(dateList):
         #print fileurl
         try:
@@ -42,17 +44,17 @@ def getVdValuePer5Mints(fromDate, toDate):
             except:
                 routeid = ""
                 pass
-            file_name = routeid +'.csv'
-            full_file_name = file_dir+file_name
+            #file_name = routeid +'.csv'
+            #full_file_name = file_dir+file_name
             #print full_file_name
             w_string  = routeid+','+value.attrib["datacollecttime"]
             for child in value :
                 w_string = w_string + ',' +child.attrib["speed"]+','+child.attrib["vsrid"]
                 for gchild in child:
                     w_string = w_string +','+ gchild.attrib["carid"]+','+gchild.attrib["volume"]
-            print w_string
-            with open(full_file_name,'ab') as fileWriter:
-                fileWriter.write(w_string+'\n')
+        print w_string
+        with open(full_file_name,'ab') as fileWriter:
+            fileWriter.write(w_string+'\n')
             #print routeid,value.attrib["datacollecttime"],value.attrib["volumn"]
 
 def getRouteIdByVdid(vdid):
