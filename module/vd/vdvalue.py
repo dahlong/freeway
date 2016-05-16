@@ -51,7 +51,9 @@ def getVdValuePer5Mints(fromDate, toDate):
             for child in value :
                 w_string = w_string + ',' +child.attrib["speed"]+','+child.attrib["vsrid"]
                 for gchild in child:
-                    w_string = w_string +','+ gchild.attrib["carid"]+','+gchild.attrib["volume"]
+                    if gchild.attrib["carid"] == 'S': # S: small car, M: median car , T
+                        w_string = w_string +','+ gchild.attrib["carid"]+','+gchild.attrib["volume"]
+
         print w_string
         with open(full_file_name,'ab') as fileWriter:
             fileWriter.write(w_string+'\n')
