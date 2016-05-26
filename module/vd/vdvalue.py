@@ -8,6 +8,7 @@ from module.roadLevel import roadlevel as tisv
 from module.roadLevel import roadlevelvalue as roadlevelvalue
 import datetime
 import vdinfo
+import urllib
 
 def getVdValueUrlByDateList(dateList):
     base_url = "http://tisvcloud.freeway.gov.tw/history/vd/"
@@ -65,11 +66,28 @@ def getRouteIdByVdid(vdid):
     infos = tisv.getXmlTagByXpath(vdinfo_root,info_xpath)
     return infos
 
-if __name__=="__main__":
-    datefrom = datetime.date(2016,05,01)
-    dateto = datetime.date(2016,05,01)
+def getvdValueFilesPer5Mins(fromDate, toDate):
+    dateList = roadlevelvalue.getHistoryDateTime(fromDate, toDate)
+    file_dir = "/home/dahlong/ETC_freewaay/vd/vd_value/data_files/"
 
-    getVdValuePer5Mints(datefrom,dateto)
+    for fileurl in getVdValueUrlByDateList(dateList):
+        my_file_name = fileurl.split('/')[-1]
+        my_file_dir = fileurl.split('/')[-2]
+        my_file_full_dir = file_dir + my_file_dir + '/'
+
+        if not os.path.exists(my_file_full_dir):
+            os.makedirs(my_file_full_dir)
+
+        urllib.urlretrieve(fileurl, filename=my_file_full_dir+my_file_name)
+
+
+if __name__=="__main__":
+    datefrom = datetime.date(2015,01,01)
+    dateto = datetime.date(2015,01,03)
+
+    #getVdValuePer5Mints(datefrom,dateto)
+    getvdValueFilesPer5Mins(datefrom,dateto)
+
 
     '''
     info = getRouteIdByVdid("nfbVD-T88-W-1.051-M-Loop")
