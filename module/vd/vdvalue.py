@@ -23,6 +23,20 @@ def getVdValueUrlByDateList(dateList):
 
     return levelValueUrl
 
+def getVdValueLocalFileNameByDateList(dateList):
+    base_location = ""
+    levelValeLocation = []
+    for date in dateList:
+        file_base_name = "vd_value5_"
+        file_extend_name = ".xml.gz"
+        for m_time in roadlevelvalue.get24TimesPer5Mins():
+            full_file_name = base_location + date + '/' + \
+            file_base_name + m_time + file_extend_name
+            print full_file_name
+            levelValeLocation.append(full_file_name)
+
+    return levelValeLocation
+
 def getVdValuePer5Mints(fromDate, toDate):
     file_name = "vdValue.csv"
     dateList = roadlevelvalue.getHistoryDateTime(fromDate, toDate)
@@ -36,6 +50,9 @@ def getVdValuePer5Mints(fromDate, toDate):
         except:
             pass
 
+        saveParseresultToFile(infoValues_xml_root,full_file_name)
+
+        '''
         value_xpath = "./Infos/Info"
         infoValues = tisv.getXmlTagByXpath(infoValues_xml_root,value_xpath)
 
@@ -59,6 +76,32 @@ def getVdValuePer5Mints(fromDate, toDate):
         with open(full_file_name,'ab') as fileWriter:
             fileWriter.write(w_string+'\n')
             #print routeid,value.attrib["datacollecttime"],value.attrib["volumn"]
+        '''
+
+def saveParseresultToFile(infoValues_xml_root,full_file_name):
+    value_xpath = "./Infos/Info"
+    infoValues = tisv.getXmlTagByXpath(infoValues_xml_root,value_xpath)
+    for value in infoValues:
+        try:
+            routeid = getRouteIdByVdid(value.attrib["vdid"])[0].attrib["routeid"]
+        except:
+            routeid = ""
+            pass
+        #file_name = routeid +'.csv'
+        #full_file_name = file_dir+file_name
+        #print full_file_name
+        w_string  = routeid+','+value.attrib["datacollecttime"]
+        for child in value :
+            w_string = w_string + ',' +child.attrib["speed"]+','+child.attrib["vsrid"]
+            for gchild in child:
+                if gchild.attrib["carid"] == 'S': # S: small car, M: median car , T
+                    w_string = w_string +','+ gchild.attrib["carid"]+','+gchild.attrib["volume"]
+
+    print w_string
+    with open(full_file_name,'ab') as fileWriter:
+        fileWriter.write(w_string+'\n')
+        #print routeid,value.attrib["datacollecttime"],value.attrib["volumn"]
+
 
 def getRouteIdByVdid(vdid):
     vdinfo_root = vdinfo.getvdInfoRoot()
@@ -66,7 +109,7 @@ def getRouteIdByVdid(vdid):
     infos = tisv.getXmlTagByXpath(vdinfo_root,info_xpath)
     return infos
 
-def getvdValueFilesPer5Mins(fromDate, toDate):
+def downloadvdValueFilesPer5Mins(fromDate, toDate):
     dateList = roadlevelvalue.getHistoryDateTime(fromDate, toDate)
     file_dir = "/home/dahlong/ETC_freewaay/vd/vd_value/data_files/"
 
@@ -80,16 +123,36 @@ def getvdValueFilesPer5Mins(fromDate, toDate):
 
         urllib.urlretrieve(fileurl, filename=my_file_full_dir+my_file_name)
 
+def parsevdValueLocalFilesPer5Mins(fromDate, toDate):
+    file_name = "vdValue.csv"
+    dateList = roadlevelvalue.getHistoryDateTime(fromDate, toDate)
+    file_dir = "/home/dahlong/ETC_freewaay/vd/vd_value/data_files/"
+    full_file_name =  file_dir + file_name
+    for filepath in getVdValueLocalFileNameByDateList(dateList):
+        try:
+            fileurl = file_dir+filepath
+            print fileurl
+            infoValues_xml_root = tisv.getXmlroot(fileurl)
+        except:
+            pass
+
+        saveParseresultToFile(infoValues_xml_root,full_file_name)
+
 
 if __name__=="__main__":
     datefrom = datetime.date(2015,01,01)
     dateto = datetime.date(2015,01,03)
 
     #getVdValuePer5Mints(datefrom,dateto)
-    getvdValueFilesPer5Mins(datefrom,dateto)
-
+    #getvdValueFilesPer5Mins(datefrom,dateto)
+    #downloadvdValueFilesPer5Mins(datefrom,dateto)
+    parsevdValueLocalFilesPer5Mins(datefrom, dateto)
 
     '''
+    dateList = roadlevelvalue.getHistoryDateTime(datefrom, dateto)
+    getVdValueLocalFileNameByDateList(dateList)
+
+
     info = getRouteIdByVdid("nfbVD-T88-W-1.051-M-Loop")
     print info[0].attrib["routeid"]
 
